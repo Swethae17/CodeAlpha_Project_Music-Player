@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Music Player</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: url("download\ \(5\).jpeg") center/cover no-repeat;
+}
+
+.player h2{
+    color: white;
+}
+
+.player {
+    background:url(download\ \(2\).jpeg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(250, 241, 241, 0.89);
+    text-align: center;
+    width: 350px;
+}
+
+
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border 0.3s;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.seek-sound {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+}
+
+.time {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+#song-title {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: aliceblue;
+}
+</style>
+<body>
+    <div class="player">
+        <h2>Music Player</h2>
+        <audio id="audio-player"><source src="./song1.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song2.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song3.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song4.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song5.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song6.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song7.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song8.mp3" type="audio/mp3"></audio>
+        <audio id="audio-player"><source src="./song9.mp3" type="audio/mp3"></audio>
+
+
+        <div class="album-art">
+            <img id="album-photo" src="images.jpeg" alt="album Photo">
+        </div>
+
+        <div class="controls">
+            <button id="prev">Previous</button>
+            <button id="play-pause">Play</button>
+            <button id="next">Next</button>
+        </div>
+        <div class="seek-sound">
+            <input type="range" id="seek-bar" value="0">
+            <div class="time">
+                <span id="current-time">00:00</span> / <span id="duration">00:00</span>
+                <span id="play" onclick="handlePlay()"><i class="material-icons"></i></span>
+            </div>
+            <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="1">
+        </div>
+        <div id="song-title">Song title</div>
+    </div>
+    <script>
+const audioPlayer = document.getElementById('audio-player');
+const playPauseButton = document.getElementById('play-pause');
+const prevButton = document.getElementById('prev');
+const nextButton = document.getElementById('next');
+const seekBar = document.getElementById('seek-bar');
+const volumeBar = document.getElementById('volume-bar');
+const currentTimeDisplay = document.getElementById('current-time');
+const durationDisplay = document.getElementById('duration');
+const songTitleDisplay = document.getElementById('song-title');
+
+const songs = [
+    { title: 'Song 1', src: 'song1.mp3' },
+    { title: 'Song 2', src: 'song2.mp3' },
+    { title: 'Song 3', src: 'song3.mp3' },
+    { title: 'Song 4', src: 'song4.mp3' },
+    { title: 'Song 5', src: 'song5.mp3' },
+    { title: 'Song 6', src: 'song6.mp3' },
+    { title: 'Song 7', src: 'song7.mp3' },
+    { title: 'Song 8', src: 'song8.mp3' },
+    { title: 'Song 9', src: 'song9.mp3' }
+];
+
+let currentSongIndex = 0;
+let isPlaying = false;
+
+function loadSong(song) {
+    audioPlayer.src = song.src;
+    songTitleDisplay.textContent = song.title;
+    audioPlayer.load();
+}
+
+function playSong() {
+    audioPlayer.play();
+    playPauseButton.textContent = 'Pause';
+    isPlaying = true;
+}
+
+function pauseSong() {
+    audioPlayer.pause();
+    playPauseButton.textContent = 'Play';
+    isPlaying = false;
+}
+
+playPauseButton.addEventListener('click', () => {
+    if (isPlaying) {
+        pauseSong();
+    } else {
+        playSong();
+    }
+});
+
+prevButton.addEventListener('click', () => {
+    currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+    loadSong(songs[currentSongIndex]);
+    playSong();
+});
+
+nextButton.addEventListener('click', () => {
+    currentSongIndex = (currentSongIndex + 1) % songs.length;
+    loadSong(songs[currentSongIndex]);
+    playSong();
+});
+
+audioPlayer.addEventListener('timeupdate', () => {
+    const currentTime = audioPlayer.currentTime;
+    const duration = audioPlayer.duration;
+    seekBar.value = (currentTime / duration) * 100;
+    currentTimeDisplay.textContent = formatTime(currentTime);
+    durationDisplay.textContent = formatTime(duration);
+});
+
+seekBar.addEventListener('input', () => {
+    const seekTime = (seekBar.value / 100) * audioPlayer.duration;
+    audioPlayer.currentTime = seekTime;
+});
+
+volumeBar.addEventListener('input', () => {
+    audioPlayer.volume = volumeBar.value;
+});
+
+audioPlayer.addEventListener('loadedmetadata', () => {
+    durationDisplay.textContent = formatTime(audioPlayer.duration);
+});
+
+function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return ${minutes}:${seconds < 10 ? '0' : ''}${seconds};
+}
+
+// Load the first song on page load
+loadSong(songs[currentSongIndex]);
+</script>
+</body>
+</html>
